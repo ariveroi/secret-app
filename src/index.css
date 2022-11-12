@@ -1,0 +1,103 @@
+/* *{
+  display: inline-block;
+} */
+
+:root{
+  --sidebar-width: 300px;
+  
+  --main-color: #000;
+  --secondary-color: #cacaca;
+}
+
+html, body{
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+
+.sidebar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  max-width: 100vh;
+  border-right: 1px solid var(--secondary-color);
+}
+
+.content{
+  position: absolute;
+  top: 0;
+  width: calc(100% - var(--sidebar-width));
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+}
+
+.card{
+  margin-top: 30px;
+}
+
+.question{
+  margin-left: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+}
+
+.question > span{
+  margin-right: 30px;
+  width: 85%;
+}
+
+.select{
+  width: 15%;
+}
+
+.sub-question{
+  margin-left: 30px;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sub-question > span{
+  margin-bottom: 15px;
+}
+
+.sub-question-textarea{
+  width: 100%;
+  /* margin-top: 30px; */
+}
+
+/* .card-content{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+} */
+
+/* .card-content > p{
+  
+  text-align: justify;
+  padding: 0;
+  margin: 0;
+}
+
+.card-content-description{
+  max-width: 80%;
+} */
