@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import axios from "axios";
 import * as XLSX from "xlsx";
 
 // import { fromFileAsync } from "xlsx-populate";
@@ -21,6 +22,8 @@ import {
   TextField,
 } from "@mui/material";
 import { type } from "@testing-library/user-event/dist/type";
+
+const api_url = "http://127.0.0.1:5000/";
 
 const controls = [
   {
@@ -63,6 +66,8 @@ const controls = [
     },
     value: "",
     comment: "",
+    value_cell: "C9",
+    comment_cell: "D9",
   },
   {
     id: "ARC-001",
@@ -91,12 +96,45 @@ const controls = [
     },
     value: "",
     comment: "",
+    value_cell: "C19",
+    comment_cell: "D19",
+  },
+  {
+    id: "CAA-001",
+    title: "Use cross-account roles to access customer accounts.",
+    innerHTML: {
+      __html: `<a href="https://aws.amazon.com/blogs/apn/securely-accessing-customer-aws-accounts-with-cross-account-iam-roles/">
+      Cross-account roles
+    </a> reduce the amount of sensitive information AWS Partners need
+    to store for their customers.`,
+    },
+    value: "n/a",
+    comment: "",
+    value_cell: "C83",
+    comment_cell: "D83",
+  },
+  {
+    id: "CAA-002",
+    title:
+      "Use external ID with cross-account roles to access customer accounts.",
+    innerHTML: {
+      __html: `The external ID allows the user that is assuming the role to
+      assert the circumstances in which they are operating. It
+      also provides a way for the account owner to permit the role
+      to be assumed only under specific circumstances. The primary
+      function of the external ID is to address and prevent the <a href="https://aws.amazon.com/blogs/security/how-to-use-external-id-when-granting-access-to-your-aws-resources">
+        confused deputy
+      </a> 
+      problem.`,
+    },
+    value: "n/a",
+    comment: "",
+    value_cell: "C85",
+    comment_cell: "D85",
   },
 ];
 
 const Hardcoded = () => {
-  const [sup00101, setSup00101] = useState("");
-  const [arch00101, setArch00101] = useState("");
   const [caa00101, setCaa00101] = useState("");
   const [allControls, setControls] = useState(controls);
 
@@ -114,17 +152,27 @@ const Hardcoded = () => {
     console.log(allControls);
   };
 
+  const handleSubmit = async () => {
+    await axios
+      .post(api_url + "gen_excel", { body: allControls })
+      .then((res) => console.log(res));
+    exportToExcel();
+  };
+
   const exportToExcel = () => {
-    fetch("https://hziubgj072.execute-api.eu-west-2.amazonaws.com/dev").then(
-      (res) => console.log(res)
-    );
-    // Call APi gateway that triggers a lambda, that lambda is going to parse the excel file and send it back to front end
-    // const worksheet = XLSX.utils.json_to_sheet(allControls);
-    // const workbook = XLSX.utils.book_new("Sheet1");
-    // XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    // XLSX.writeFile(workbook, "SelfAssessment.xlsx");
-    // let buffer = XLSX.write(workbook, { bookType: "xlsx", type: "buffer" });
-    // XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+    axios
+      .get(api_url + "get_excel", {
+        method: "GET",
+        responseType: "blob", // important
+      })
+      .then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `${Date.now()}.xlsx`);
+        document.body.appendChild(link);
+        link.click();
+      });
   };
 
   return (
@@ -199,12 +247,12 @@ const Hardcoded = () => {
                   label="Yes/No"
                   onChange={(e) => handleSelectChange(e, 1)}
                 >
-                  <MenuItem value={"yes"}>Yes</MenuItem>
-                  <MenuItem value={"no"}>No</MenuItem>
+                  <MenuItem value={"no"}>Yes</MenuItem>
+                  <MenuItem value={"yes"}>No</MenuItem>
                 </Select>
               </FormControl>
             </div>
-            {allControls[1].value === "yes" && (
+            {allControls[1].value === "no" && (
               <div className="sub-question">
                 <span>
                   Please provide information on who has access to the root user
@@ -248,48 +296,70 @@ const Hardcoded = () => {
             {caa00101 === "yes" && (
               <>
                 <div className="card-content-description">
-                  <h3>
-                    CAA-001. Use cross-account roles to access customer
-                    accounts.{" "}
-                  </h3>
-                  <p>
-                    <a href="https://aws.amazon.com/blogs/apn/securely-accessing-customer-aws-accounts-with-cross-account-iam-roles/">
-                      Cross-account roles
-                    </a>{" "}
-                    reduce the amount of sensitive information AWS Partners need
-                    to store for their customers.{" "}
-                  </p>
-                  <TextField
-                    id="caa-001"
-                    label="Provide more context"
-                    multiline
-                    rows={4}
-                    className="sub-question-textarea"
-                  />
+                  <div className="question">
+                    <div className="control-question">
+                      <h3>
+                        {allControls[2].id}. {allControls[2].title}
+                      </h3>
+                      <p dangerouslySetInnerHTML={allControls[2].innerHTML}></p>
+                    </div>
+                    <FormControl className="select">
+                      {/* <FormLabel>This is a form label example</FormLabel> */}
+                      <InputLabel id="sup-001-01">Yes/No</InputLabel>
+                      <Select
+                        labelId="caa-001"
+                        value={""}
+                        label="Yes/No"
+                        onChange={(e) => handleSelectChange(e, 2)}
+                      >
+                        <MenuItem value={"yes"}>Yes</MenuItem>
+                        <MenuItem value={"no"}>No</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
+                  <div className="sub-question">
+                    <TextField
+                      id="caa-001"
+                      label="Provide more context"
+                      multiline
+                      rows={4}
+                      className="sub-question-textarea"
+                      onChange={(e) => handleTextareaChange(e, 2)}
+                    />
+                  </div>
                 </div>
                 <div className="card-content-description">
-                  <h3>
-                    CAA-002. Use external ID with cross-account roles to access
-                    customer accounts.
-                  </h3>
-                  <p>
-                    The external ID allows the user that is assuming the role to
-                    assert the circumstances in which they are operating. It
-                    also provides a way for the account owner to permit the role
-                    to be assumed only under specific circumstances. The primary
-                    function of the external ID is to address and prevent the{" "}
-                    <a href="https://aws.amazon.com/blogs/security/how-to-use-external-id-when-granting-access-to-your-aws-resources">
-                      confused deputy
-                    </a>{" "}
-                    problem.
-                  </p>
-                  <TextField
-                    id="caa-002"
-                    label="Provide more context"
-                    multiline
-                    rows={4}
-                    className="sub-question-textarea"
-                  />
+                  <div className="question">
+                    <div className="control-question">
+                      <h3>
+                        {allControls[3].id}. {allControls[3].title}
+                      </h3>
+                      <p dangerouslySetInnerHTML={allControls[3].innerHTML}></p>
+                    </div>
+                    <FormControl className="select">
+                      {/* <FormLabel>This is a form label example</FormLabel> */}
+                      <InputLabel id="sup-001-01">Yes/No</InputLabel>
+                      <Select
+                        labelId="caa-001"
+                        value={""}
+                        label="Yes/No"
+                        onChange={(e) => handleSelectChange(e, 2)}
+                      >
+                        <MenuItem value={"yes"}>Yes</MenuItem>
+                        <MenuItem value={"no"}>No</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </div>
+                  <div className="sub-question">
+                    <TextField
+                      id="caa-001"
+                      label="Provide more context"
+                      multiline
+                      rows={4}
+                      className="sub-question-textarea"
+                      onChange={(e) => handleTextareaChange(e, 2)}
+                    />
+                  </div>
                 </div>
               </>
             )}
@@ -298,9 +368,9 @@ const Hardcoded = () => {
         <Button
           variant="contained"
           style={{ marginTop: "40px" }}
-          onClick={exportToExcel}
+          onClick={handleSubmit}
         >
-          Download Excel
+          Submit
         </Button>
       </Container>
     </div>

@@ -60,8 +60,13 @@ code {
   width: 90%;
 }
 
+
 .question > span{
   margin-right: 30px;
+  width: 85%;
+}
+
+.control-question{
   width: 85%;
 }
 
